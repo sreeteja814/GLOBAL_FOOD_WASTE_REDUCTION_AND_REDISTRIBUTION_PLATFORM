@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: foodshare-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: foodshare_root_2024
+      MYSQL_DATABASE: foodshare
+      MYSQL_USER: foodshare_user
+      MYSQL_PASSWORD: foodshare_pass_2024
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD","mysqladmin","ping","-h","localhost","-u","root","-pfoodshare_root_2024"]
+      interval: 10s
+      timeout: 20s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: foodshare-backend
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: foodshare
+      DB_USER: foodshare_user
+      DB_PASSWORD: foodshare_pass_2024
+      JWT_SECRET: foodshare_jwt_super_secret_2024_change_in_prod
+      HF_TOKEN: ${HF_TOKEN}
+      FRONTEND_URL: http://localhost:8501
+    ports:
+      - "5000:5000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: foodshare-streamlit
+    restart: always
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_HEADLESS=true
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
