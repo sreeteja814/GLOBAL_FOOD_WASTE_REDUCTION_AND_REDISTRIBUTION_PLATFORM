@@ -15,9 +15,9 @@ SUGGESTIONS = [
 
 HF_ROUTER_URL = "https://router.huggingface.co/v1/chat/completions"
 HF_MODELS = [
-    "meta-llama/Llama-3.1-8B-Instruct",
-    "mistralai/Mistral-7B-Instruct-v0.3",
-    "Qwen/Qwen2.5-7B-Instruct",
+    "Qwen/Qwen2.5-7B-Instruct:hf-inference",
+    "microsoft/Phi-3-mini-4k-instruct:hf-inference",
+    "HuggingFaceH4/zephyr-7b-beta:hf-inference",
 ]
 
 def get_hf_token():
